@@ -18,6 +18,8 @@ const routes: Record<string, string> = {
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // 작은 글꼴 파일이 data: 주소로 들어가면 CSP(font-src 'self')가 막는다. 항상 파일로 낸다.
+  build: { assetsInlineLimit: 0 },
   server: {
     proxy: Object.fromEntries(Object.entries(routes).map(([path, target]) => [path, { target, changeOrigin: true }])),
   },

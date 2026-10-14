@@ -1,5 +1,5 @@
 /**
- * /manage (의사·원무과장·관리자·원장): 대기열·접수, 환자 관리(등록·검색), 계정·감사 로그, 현황, 진료(EMR)·수납(샘플).
+ * /manage (의사·원무과장·관리자·원장): 대기열·접수, 환자 관리(원장: 검색·등록, 관리자: 등록만), 계정·감사 로그, 현황, 진료(EMR)·수납(샘플).
  * 메뉴는 역할에 맞게 보여 주지만, 권한은 서버가 API 마다 다시 검사한다 (403 이면 안내).
  */
 import { BarChart3, ClipboardList, Receipt, ScrollText, Stethoscope, UserCog, Users } from "lucide-react";
@@ -46,7 +46,7 @@ export default function Manage() {
         <Split options={[{ value: "queue", label: "오늘 대기열" }, { value: "checkin", label: "현장 접수" }]}
           render={(v) => (v === "queue" ? <TodayQueue /> : <CheckinDesk />)} />
       )}
-      {tab === "patients" && <Patients canRegister />}
+      {tab === "patients" && <Patients canRegister canSearch={role !== "ADMIN"} />}
       {tab === "accounts" && (
         <Split options={[{ value: "users", label: "계정" }, { value: "audit", label: "감사 로그" }]}
           render={(v) => (v === "users" ? <AdminUsers /> : <AuditLogs />)} />

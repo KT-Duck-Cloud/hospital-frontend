@@ -11,7 +11,10 @@ WORKDIR /src
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY . .
-RUN npm run build
+RUN npm run build \
+    && mkdir -p dist/licenses \
+    && cp node_modules/@fontsource/noto-sans-kr/LICENSE dist/licenses/NotoSansKR-OFL-1.1.txt \
+    && cp node_modules/@fontsource/ibm-plex-mono/LICENSE dist/licenses/IBMPlexMono-OFL-1.1.txt
 
 # ---- 실행 단계: nginx(root 아님, 포트 8080)로 dist/ 만 서빙 ----
 FROM nginxinc/nginx-unprivileged:1.30.5-alpine3.24

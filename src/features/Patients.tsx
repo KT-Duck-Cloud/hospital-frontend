@@ -55,7 +55,29 @@ function RegisterModal({ onClose, onDone }: { onClose: () => void; onDone: (p: P
   );
 }
 
-export default function Patients({ canRegister = false }: { canRegister?: boolean }) {
+/** 환자 검색(R9·R10) 권한이 없는 역할(ADMIN)은 등록(R14)만 쓴다. */
+function RegisterOnly() {
+  const [open, setOpen] = useState(false);
+  const [last, setLast] = useState<Patient | null>(null);
+  return (
+    <Card className="grid h-[320px] place-items-center text-center">
+      <div>
+        <UserRound size={32} className="mx-auto mb-2 text-ink-400" />
+        <p className="mb-4 text-[15px] text-ink-500">이 계정은 환자를 등록할 수 있습니다. 검색·상세 조회 권한은 없습니다.</p>
+        <Btn variant="primary" onClick={() => setOpen(true)}><Plus size={17} /> 환자 등록</Btn>
+        {last && <p className="mt-4 text-[13px] text-ink-500">방금 등록: {last.name} ({last.chart_no})</p>}
+      </div>
+      {open && <RegisterModal onClose={() => setOpen(false)} onDone={(p) => { setOpen(false); setLast(p); }} />}
+    </Card>
+  );
+}
+
+export default function Patients({ canRegister = false, canSearch = true }: { canRegister?: boolean; canSearch?: boolean }) {
+  if (!canSearch) return canRegister ? <RegisterOnly /> : null;
+  return <PatientSearch canRegister={canRegister} />;
+}
+
+function PatientSearch({ canRegister }: { canRegister: boolean }) {
   const dir = useDirectory();
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
