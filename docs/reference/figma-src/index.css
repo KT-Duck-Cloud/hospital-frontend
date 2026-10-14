@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --color-brand-50: #eef7f8;
+  --color-brand-100: #d6edf0;
+  --color-brand-200: #a9dbe1;
+  --color-brand-500: #1a95a6;
+  --color-brand-600: #0f7b8a;
+  --color-brand-700: #0b6471;
+  --color-ink-900: #14283a;
+  --color-ink-700: #33485c;
+  --color-ink-500: #5d7184;
+  --color-ink-400: #8a9bad;
+  --color-line: #e3e9ef;
+  --color-canvas: #f5f8fa;
+  --color-ok: #14946a;
+  --color-warn: #c77a0a;
+  --color-danger: #d33f49;
+}
+
+html, body, #root { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background: var(--color-canvas);
+  color: var(--color-ink-900);
+  -webkit-font-smoothing: antialiased;
+}
+.num { font-variant-numeric: tabular-nums; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d3dce5; border-radius: 8px; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .35s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(20,148,106,.45); } 100% { box-shadow: 0 0 0 7px rgba(20,148,106,0); } }
+.pulse-ok { animation: pulse-ring 2s infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin 2.4s linear infinite; }

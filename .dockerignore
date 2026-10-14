@@ -1,0 +1,12 @@
+node_modules
+dist
+*.log
+.vite
+.git
+**/*.test.ts
+
+# 저장소 문서·참고 자료 (이미지에 넣지 않는다)
+docs
+*.md
+.env
+.env.*

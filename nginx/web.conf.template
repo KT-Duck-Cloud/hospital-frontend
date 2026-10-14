@@ -1,0 +1,59 @@
+# 시작할 때 ${...} 자리에 환경변수(AUTH_UPSTREAM 등, Dockerfile 의 NGINX_ENVSUBST_FILTER)를 넣어 /tmp/web.conf 로 만든다.
+# /api/v1/* 경로는 docs/api-spec.md 1장 표와 같다 (Helm 의 ingress.yaml 과도 같게 유지한다).
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    client_max_body_size 1m;
+
+    include /etc/nginx/snippets/security-headers.conf;
+
+    # API 서비스 주소를 요청 때마다(10초 캐시) 다시 찾는다. 시작할 때 한 번만 찾으면, 컨테이너가 다시 만들어져
+    # IP 가 바뀐 뒤에도 옛 IP(다른 컨테이너일 수 있음)로 보낸다. 주소는 컨테이너의 /etc/resolv.conf 의 DNS 서버.
+    # 주의: resolver 는 search 도메인을 붙이지 않으므로 k8s 에서는 전체 이름(<서비스>.<네임스페이스>.svc.cluster.local)을 준다.
+    resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
+    resolver_timeout 3s;
+    set $auth_upstream ${AUTH_UPSTREAM};
+    set $reservation_upstream ${RESERVATION_UPSTREAM};
+    set $stats_upstream ${STATS_UPSTREAM};
+
+    # 프로세스 살아 있음 (liveness·readiness). API 서비스는 확인하지 않는다.
+    location = /healthz {
+        access_log off;
+        default_type application/json;
+        return 200 '{"status":"ok","service":"web","version":"${APP_VERSION}"}';
+    }
+
+    # ---- API: 서비스별로 넘긴다 (변수로 넘기면 요청 주소를 그대로 보낸다) ----
+    location ~ ^/api/v1/(auth|admin)(/|$) {
+        proxy_pass $auth_upstream;
+        include /etc/nginx/snippets/proxy.conf;
+    }
+    location ~ ^/api/v1/(reservations|queue|patients|departments|doctors|me)(/|$) {
+        proxy_pass $reservation_upstream;
+        include /etc/nginx/snippets/proxy.conf;
+    }
+    location ~ ^/api/v1/(stats|system)(/|$) {
+        proxy_pass $stats_upstream;
+        include /etc/nginx/snippets/proxy.conf;
+    }
+    # 표에 없는 /api/* 는 화면(index.html)으로 돌리지 않고 404
+    location /api/ {
+        default_type application/json;
+        return 404 '{"code":"NOT_FOUND","message":"찾을 수 없습니다"}';
+    }
+
+    # ---- 화면 ----
+    # 빌드 파일은 이름에 해시가 붙어 있어 오래 캐시한다.
+    location /assets/ {
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+    # /login, /workspace, /manage 등은 모두 index.html (React 라우터가 처리). index.html 은 매번 새로 확인한다.
+    location / {
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-cache";
+        try_files $uri /index.html;
+    }
+}
