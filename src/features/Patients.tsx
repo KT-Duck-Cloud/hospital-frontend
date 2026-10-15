@@ -110,7 +110,7 @@ function PatientSearch({ canRegister }: { canRegister: boolean }) {
                   <p className="text-[15px] font-semibold">{x.name} <span className="ml-1 text-[13px] font-normal text-ink-400">{x.birth_date}</span></p>
                   <p className="num font-mono text-[12.5px] text-ink-400">{x.chart_no}</p>
                 </div>
-                <span className="num text-[12px] text-ink-400">{x.phone_masked ?? ""}</span>
+                <span className="num text-[12px] text-ink-400">{x.phone ?? ""}</span>
               </button>
             </li>
           ))}
@@ -155,7 +155,7 @@ function PatientSearch({ canRegister }: { canRegister: boolean }) {
                 ))}
               </ul>
             ) : <Empty>볼 수 있는 예약이 없습니다.</Empty>}
-            <p className="mt-3 text-[12.5px] text-ink-400">간호사는 자기 부서 예약만 보입니다. 이 조회는 감사 로그에 남습니다.</p>
+            <p className="mt-3 text-[12.5px] text-ink-400">간호사는 자기 부서 예약만, 원무과장은 전체 부서 예약이 보입니다(예약 메모는 보이지 않습니다). 이 조회는 감사 로그에 남습니다.</p>
           </Card>
         )}
       </div>

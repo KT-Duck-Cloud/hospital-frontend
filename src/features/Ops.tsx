@@ -183,12 +183,12 @@ export function HospitalStats() {
         <>
           <div className="grid grid-cols-4 gap-4">
             <Kpi label="예약" value={r.data.totals.total} unit="건" sub={dateLabel(r.data.date)} icon={<CalendarCheck size={19} />} tone="bg-brand-50 text-brand-600" />
-            <Kpi label="접수 (대기)" value={r.data.totals.checked_in} unit="명" icon={<Clock size={19} />} tone="bg-amber-50 text-warn" />
+            <Kpi label="진료 대기" value={r.data.departments.reduce((a, d) => a + d.waiting, 0)} unit="명" icon={<Clock size={19} />} tone="bg-amber-50 text-warn" />
             <Kpi label="접수 전" value={r.data.totals.not_checked_in} unit="건" icon={<ClipboardList size={19} />} tone="bg-slate-100 text-slate-600" />
             <Kpi label="취소" value={r.data.totals.canceled} unit="건" icon={<Ban size={19} />} tone="bg-red-50 text-danger" />
           </div>
           <Card className="mt-4 overflow-hidden">
-            <CardHead title="부서별 대기" sub="대기 = 접수된 예약 (진료 완료 단계는 아직 없음)" />
+            <CardHead title="부서별 대기" sub="대기 = 접수 후 진료 전 (진료중·진료완료는 제외)" />
             <table className="w-full text-left text-[14.5px]">
               <thead><tr className={tableHeadRow}><Th>부서</Th><Th className="text-right">예약</Th><Th className="text-right">대기</Th><Th className="text-right">접수 전</Th><Th className="text-right">취소</Th></tr></thead>
               <tbody>

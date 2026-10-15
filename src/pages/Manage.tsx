@@ -1,10 +1,14 @@
 /**
- * /manage (의사·원무과장·관리자·원장): 대기열·접수, 환자 관리(원장: 검색·등록, 관리자: 등록만), 계정·감사 로그, 현황, 진료(EMR)·수납(샘플).
+ * /manage (의사·원무과장·관리자·원장): 대기열·접수, 환자 관리(원장: 검색·등록, 관리자: 등록만), 계정·감사 로그, 현황,
+ * 진료(의사: 진료 대기열·시작·완료, 원장: EMR 준비 중 예시)·수납(준비 중 예시), 연락처.
+ * 원무과장: 현장 접수(예약 조회·접수·취소, 예약 등록은 없음), 환자 검색(등록은 없음), 수납(준비 중), 연락처.
  * 메뉴는 역할에 맞게 보여 주지만, 권한은 서버가 API 마다 다시 검사한다 (403 이면 안내).
  */
-import { BarChart3, ClipboardList, Receipt, ScrollText, Stethoscope, UserCog, Users } from "lucide-react";
+import { BarChart3, ClipboardCheck, ClipboardList, Phone, Receipt, ScrollText, Search, Stethoscope, UserCog, Users } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { AdminUsers, AuditLogs } from "../features/Admin";
+import Contacts from "../features/Contacts";
+import DoctorDesk from "../features/DoctorDesk";
 import { CheckinDesk, TodayQueue } from "../features/FrontDesk";
 import { DepartmentStats, HospitalStats } from "../features/Ops";
 import Patients from "../features/Patients";
@@ -12,16 +16,22 @@ import { SampleBilling, SampleEmr } from "../features/Samples";
 import { useAppState } from "../lib/appState";
 import type { Role } from "../lib/types";
 import { Shell, type NavItem } from "../ui/Shell";
-import { Segmented } from "../ui/kit";
+import { Chip, Segmented } from "../ui/kit";
 
-type Tab = "queue" | "patients" | "accounts" | "stats" | "emr" | "billing";
+type Tab = "queue" | "checkin" | "patients" | "search" | "accounts" | "stats" | "emr" | "billing" | "contacts";
+
+/** 메뉴 옆에 붙이는 "준비 중" 표시 (기능이 아직 없고 시연용 예시만 있는 메뉴) */
+const soon = <Chip className="bg-amber-50 text-warn ring-amber-200">준비 중</Chip>;
 const ALL: (NavItem<Tab> & { roles: Role[] })[] = [
   { id: "queue", label: "대기열 · 접수", icon: <ClipboardList size={20} />, roles: ["DIRECTOR"] },
+  { id: "checkin", label: "현장 접수", icon: <ClipboardCheck size={20} />, roles: ["MANAGER"] },
   { id: "patients", label: "환자 관리", icon: <Users size={20} />, roles: ["ADMIN", "DIRECTOR"] },
+  { id: "search", label: "환자 검색", icon: <Search size={20} />, roles: ["MANAGER"] },
   { id: "accounts", label: "계정 · 감사 로그", icon: <UserCog size={20} />, roles: ["ADMIN", "DIRECTOR"] },
   { id: "stats", label: "현황", icon: <BarChart3 size={20} />, roles: ["DIRECTOR"] },
   { id: "emr", label: "진료 (EMR)", icon: <Stethoscope size={20} />, roles: ["DOCTOR", "DIRECTOR"] },
-  { id: "billing", label: "수납", icon: <Receipt size={20} />, roles: ["MANAGER", "DIRECTOR"] },
+  { id: "billing", label: "수납", icon: <Receipt size={20} />, roles: ["MANAGER", "DIRECTOR"], badge: soon },
+  { id: "contacts", label: "연락처", icon: <Phone size={20} />, roles: ["DOCTOR", "MANAGER", "ADMIN", "DIRECTOR"] },
 ];
 const SUBTITLE: Partial<Record<Role, string>> = { DOCTOR: "진료", MANAGER: "원무과", ADMIN: "관리자", DIRECTOR: "원장" };
 
@@ -46,7 +56,9 @@ export default function Manage() {
         <Split options={[{ value: "queue", label: "오늘 대기열" }, { value: "checkin", label: "현장 접수" }]}
           render={(v) => (v === "queue" ? <TodayQueue /> : <CheckinDesk />)} />
       )}
+      {tab === "checkin" && <CheckinDesk canBook={false} />}
       {tab === "patients" && <Patients canRegister canSearch={role !== "ADMIN"} />}
+      {tab === "search" && <Patients />}
       {tab === "accounts" && (
         <Split options={[{ value: "users", label: "계정" }, { value: "audit", label: "감사 로그" }]}
           render={(v) => (v === "users" ? <AdminUsers /> : <AuditLogs />)} />
@@ -55,8 +67,9 @@ export default function Manage() {
         <Split options={[{ value: "hospital", label: "병원 전체 (오늘)" }, { value: "dept", label: "부서 · 의사별" }]}
           render={(v) => (v === "hospital" ? <HospitalStats /> : <DepartmentStats />)} />
       )}
-      {tab === "emr" && <SampleEmr />}
+      {tab === "emr" && (role === "DOCTOR" ? <DoctorDesk /> : <SampleEmr />)}
       {tab === "billing" && <SampleBilling />}
+      {tab === "contacts" && <Contacts />}
       {tab === "accounts" && <p className="mt-4 flex items-center gap-1.5 text-[12.5px] text-ink-400"><ScrollText size={14} />계정 변경과 감사 로그 조회도 감사 로그에 남습니다.</p>}
     </Shell>
   );

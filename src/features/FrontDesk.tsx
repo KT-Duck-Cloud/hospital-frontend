@@ -12,7 +12,8 @@ import { addDays, dateLabel, kstTime, todayKst } from "../lib/time";
 import type { Page, QueueOut, Reservation } from "../lib/types";
 import { useApi } from "../lib/useApi";
 import {
-  Avatar, Btn, Card, Chip, cx, Empty, ErrorNotice, Kpi, Loading, Modal, ReservationChip, SearchBox, tableHeadRow, tableRow, Th,
+  Avatar, Btn, Card, Chip, cx, Empty, ErrorNotice, Kpi, Loading, Modal, ProgressChip, ReservationChip, SearchBox, tableHeadRow,
+  tableRow, Th,
 } from "../ui/kit";
 import Booking from "./Booking";
 import { useDirectory } from "./directory";
@@ -50,6 +51,7 @@ export function TodayQueue() {
   const items = list.data?.items ?? [];
   const waitingCheckin = items.filter((r) => r.status === "BOOKED" && r.checkin_status === "NOT_CHECKED_IN");
   const canceled = items.filter((r) => r.status === "CANCELED").length;
+  const inLine = (queue.data?.items ?? []).filter((q) => q.checkin_status === "CHECKED_IN").length;  // 진료대기만
   const forbidden = list.error?.forbidden && queue.error?.forbidden;
 
   if (forbidden) return <ErrorNotice error={list.error!} />;
@@ -58,7 +60,7 @@ export function TodayQueue() {
       <div className="mb-5 flex items-end justify-between">
         <div>
           <p className="text-[24px] font-bold tracking-tight">오늘 대기열</p>
-          <p className="mt-1 text-[15px] text-ink-500">지금 진료 대기 {queue.data?.items.length ?? 0}명, 접수 대기 {waitingCheckin.length}명입니다.</p>
+          <p className="mt-1 text-[15px] text-ink-500">지금 진료 대기 {inLine}명, 접수 대기 {waitingCheckin.length}명입니다.</p>
         </div>
         <Btn onClick={reload}><RefreshCw size={16} /> 새로고침</Btn>
       </div>
@@ -66,7 +68,7 @@ export function TodayQueue() {
       <div className="grid grid-cols-4 gap-4">
         <Kpi label="오늘 예약" value={items.length - canceled} unit="건" sub={`전체 ${list.data?.total ?? 0}건 중 취소 ${canceled}건 제외`} icon={<CalendarCheck size={19} />} tone="bg-brand-50 text-brand-600" />
         <Kpi label="접수 대기" value={waitingCheckin.length} unit="명" sub="예약했지만 아직 접수 전" icon={<ClipboardList size={19} />} tone="bg-slate-100 text-slate-600" />
-        <Kpi label="진료 대기" value={queue.data?.items.length ?? 0} unit="명" sub="접수 완료 · 대기번호 순" icon={<Clock size={19} />} tone="bg-amber-50 text-warn" />
+        <Kpi label="진료 대기" value={inLine} unit="명" sub="접수 완료 · 아직 진료 전" icon={<Clock size={19} />} tone="bg-amber-50 text-warn" />
         <Kpi label="취소" value={canceled} unit="건" sub="오늘 예약 중 취소" icon={<Ban size={19} />} tone="bg-red-50 text-danger" />
       </div>
 
@@ -104,7 +106,7 @@ export function TodayQueue() {
           <header className="flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-amber-50 text-warn"><Clock size={17} /></span>
-              <h3 className="text-[16px] font-semibold">진료 대기</h3>
+              <h3 className="text-[16px] font-semibold">진료 현황</h3>
               <span className="text-[13px] text-ink-400">접수 순</span>
             </div>
             <span className="num grid h-7 min-w-7 place-items-center rounded-full bg-white px-2 text-[13.5px] font-semibold ring-1 ring-line">{queue.data?.items.length ?? 0}</span>
@@ -115,7 +117,7 @@ export function TodayQueue() {
                 <div className="flex items-center gap-2.5">
                   <span className="num grid h-8 min-w-8 place-items-center rounded-lg bg-canvas px-1.5 font-mono text-[14px] font-semibold text-ink-700">{q.queue_no}</span>
                   <p className="min-w-0 flex-1 truncate text-[15.5px] font-semibold">{q.patient_name} <span className="font-mono text-[12.5px] font-normal text-ink-400">{q.chart_no}</span></p>
-                  <Chip className="bg-amber-50 text-warn ring-amber-200">진료대기</Chip>
+                  <ProgressChip status={q.checkin_status} />
                 </div>
                 <p className="mt-2 text-[13px] text-ink-500">{dir.deptName(q.department_id)} · {q.doctor_name ?? "의사 미지정"}</p>
                 {q.doctor_id && <p className="mt-0.5 flex items-center gap-1 text-[12.5px] text-ink-400"><DoorOpen size={13} />{dir.doctors.find((d) => d.id === q.doctor_id)?.room_no ?? "—"}호 진료실</p>}
@@ -133,7 +135,7 @@ export function TodayQueue() {
 }
 
 /* ───────────── 현장 접수 ───────────── */
-export function CheckinDesk() {
+export function CheckinDesk({ canBook = true }: { canBook?: boolean } = {}) {
   const { flash } = useAppState();
   const dir = useDirectory();
   const [date, setDate] = useState(todayKst());
@@ -167,14 +169,14 @@ export function CheckinDesk() {
           <button type="button" onClick={() => setDate(addDays(date, 1))} className="grid h-11 w-11 place-items-center rounded-xl border border-line bg-white hover:bg-canvas" aria-label="다음 날"><ChevronRight size={20} /></button>
           <Btn onClick={() => setDate(todayKst())} variant="soft" className="h-11">오늘</Btn>
         </div>
-        <Btn variant="primary" className="h-11 px-5 text-[15px]" onClick={() => setBooking(true)}><Plus size={18} /> 예약 등록</Btn>
+        {canBook && <Btn variant="primary" className="h-11 px-5 text-[15px]" onClick={() => setBooking(true)}><Plus size={18} /> 예약 등록</Btn>}
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
         <SearchBox value={q} onChange={setQ} placeholder="환자명 또는 차트번호" className="w-[300px]" />
         <div className="ml-auto flex items-center gap-2 text-[13.5px] text-ink-500">
           <Chip className="bg-brand-50 text-brand-700 ring-brand-200">예약확정 <b className="num">{count((r) => r.status === "BOOKED" && r.checkin_status === "NOT_CHECKED_IN")}</b></Chip>
-          <Chip className="bg-emerald-50 text-ok ring-emerald-200">접수완료 <b className="num">{count((r) => r.status === "BOOKED" && r.checkin_status === "CHECKED_IN")}</b></Chip>
+          <Chip className="bg-emerald-50 text-ok ring-emerald-200">접수완료 <b className="num">{count((r) => r.status === "BOOKED" && r.checkin_status !== "NOT_CHECKED_IN")}</b></Chip>
           <Chip className="bg-red-50 text-danger ring-red-200">취소됨 <b className="num">{count((r) => r.status === "CANCELED")}</b></Chip>
         </div>
       </div>

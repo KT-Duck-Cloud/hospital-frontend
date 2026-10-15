@@ -10,15 +10,15 @@ import { Bare } from "../ui/Shell";
 import { Btn, cx, Field, inputCls } from "../ui/kit";
 
 const ROLE_HINT: Record<Role, string> = {
-  PATIENT: "예약하기, 내 예약, 내 진료기록·영수증",
-  NURSE: "오늘 대기열, 현장 접수, 환자 검색",
-  DOCTOR: "관리 화면 (진료 기능은 샘플)",
-  MANAGER: "관리 화면 (수납 기능은 샘플)",
-  ADMIN: "관리 화면 · 계정과 감사 로그",
-  DEPT_HEAD: "대기열, 부서 현황",
-  DIRECTOR: "관리 화면 · 전체 업무와 현황",
-  DEVELOPER: "시스템 상태",
-  TESTER: "업무 화면 전체와 시스템 상태",
+  PATIENT: "예약하기, 내 예약, 내 진료기록·영수증, 연락처",
+  NURSE: "오늘 대기열, 현장 접수, 환자 검색·등록, 연락처",
+  DOCTOR: "내 진료 대기열(진료 시작·완료), 연락처",
+  MANAGER: "현장 접수(예약 조회·접수·취소), 환자 검색, 연락처 · 수납은 준비 중",
+  ADMIN: "환자 등록, 계정과 감사 로그, 연락처",
+  DEPT_HEAD: "오늘 대기열, 부서 현황, 연락처",
+  DIRECTOR: "대기열·접수, 환자 관리, 계정과 감사 로그, 현황, 연락처 · 진료(EMR)·수납은 준비 중",
+  DEVELOPER: "시스템 상태, 연락처",
+  TESTER: "업무 화면 전체와 시스템 상태, 연락처",
 };
 
 export default function Login() {

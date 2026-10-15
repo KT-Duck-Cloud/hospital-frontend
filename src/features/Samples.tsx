@@ -1,6 +1,6 @@
-/** 진료(EMR)·수납 탭: 이번 범위에 기능이 없어 "샘플 데이터" 고정 예시만 보여 준다. 서버에 아무것도 보내지 않는다. */
+/** 진료(EMR)·수납 탭: 이번 범위에 기능이 없어 "준비 중(시연용 예시)" 고정 예시만 보여 준다. 서버에 아무것도 보내지 않는다. */
 import { Info, Receipt, Stethoscope } from "lucide-react";
-import { Card, CardHead, Chip, Field, inputCls, SampleBadge, tableHeadRow, tableRow, Th } from "../ui/kit";
+import { Card, CardHead, Chip, Field, inputCls, PlannedBadge, tableHeadRow, tableRow, Th } from "../ui/kit";
 
 const Notice = ({ children }: { children: string }) => (
   <div className="mb-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3.5">
@@ -12,10 +12,10 @@ const Notice = ({ children }: { children: string }) => (
 export function SampleEmr() {
   return (
     <>
-      <Notice>진료(EMR) 기능은 이번 범위에 없습니다. 아래는 화면 예시이며, 실제 환자 정보가 아니고 저장되지 않습니다.</Notice>
+      <Notice>진료(EMR) 기능은 준비 중입니다. 아래는 시연용 예시이며, 실제 환자 정보가 아니고 저장되지 않습니다.</Notice>
       <div className="grid grid-cols-[320px_1fr] gap-4">
         <Card className="overflow-hidden">
-          <CardHead title="진료 대기" icon={<Stethoscope size={18} />} right={<SampleBadge />} />
+          <CardHead title="진료 대기" icon={<Stethoscope size={18} />} right={<PlannedBadge />} />
           <ul className="divide-y divide-line px-2 pb-2">
             {["예시 환자 A", "예시 환자 B", "예시 환자 C"].map((n, i) => (
               <li key={n} className="flex items-center gap-3 px-3 py-3">
@@ -29,7 +29,7 @@ export function SampleEmr() {
         <Card className="p-6">
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-[18px] font-bold">예시 환자 A <span className="ml-2 text-[14px] font-normal text-ink-400">진료 기록 작성 예시</span></h3>
-            <SampleBadge />
+            <PlannedBadge />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="주호소"><input className={inputCls} disabled value="(예시) 기침이 3일째 계속됨" readOnly /></Field>
@@ -52,9 +52,9 @@ export function SampleBilling() {
   ];
   return (
     <>
-      <Notice>수납 기능은 이번 범위에 없습니다. 아래는 화면 예시이며, 실제 결제 정보가 아니고 저장되지 않습니다.</Notice>
+      <Notice>수납 기능은 준비 중입니다. 아래는 시연용 예시이며, 실제 결제 정보가 아니고 저장되지 않습니다.</Notice>
       <Card className="overflow-hidden">
-        <CardHead title="수납 대기" icon={<Receipt size={18} />} right={<SampleBadge />} />
+        <CardHead title="수납 대기" icon={<Receipt size={18} />} right={<PlannedBadge />} />
         <table className="w-full text-left text-[14.5px]">
           <thead><tr className={tableHeadRow}><Th>번호</Th><Th>항목</Th><Th className="text-right">금액</Th><Th>상태</Th></tr></thead>
           <tbody>

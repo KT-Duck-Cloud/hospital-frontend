@@ -29,7 +29,7 @@ server {
         proxy_pass $auth_upstream;
         include /etc/nginx/snippets/proxy.conf;
     }
-    location ~ ^/api/v1/(reservations|queue|patients|departments|doctors|me)(/|$) {
+    location ~ ^/api/v1/(reservations|queue|patients|departments|doctors|doctor|me|staff|contacts|slots)(/|$) {
         proxy_pass $reservation_upstream;
         include /etc/nginx/snippets/proxy.conf;
     }

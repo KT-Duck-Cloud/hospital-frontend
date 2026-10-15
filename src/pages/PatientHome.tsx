@@ -1,16 +1,18 @@
 /** / (환자): 예약하기, 내 예약(취소), 내 진료기록·영수증 */
-import { CalendarCheck, CalendarPlus, FileText } from "lucide-react";
+import { CalendarCheck, CalendarPlus, FileText, Phone } from "lucide-react";
 import { useState } from "react";
 import Booking from "../features/Booking";
+import Contacts from "../features/Contacts";
 import { MyRecords, MyReservations } from "../features/Mine";
 import { useAppState } from "../lib/appState";
 import { Shell, type NavItem } from "../ui/Shell";
 
-type Tab = "book" | "mine" | "records";
+type Tab = "book" | "mine" | "records" | "contacts";
 const NAV: NavItem<Tab>[] = [
   { id: "book", label: "예약하기", icon: <CalendarPlus size={20} /> },
   { id: "mine", label: "내 예약", icon: <CalendarCheck size={20} /> },
   { id: "records", label: "진료기록 · 영수증", icon: <FileText size={20} /> },
+  { id: "contacts", label: "연락처", icon: <Phone size={20} /> },
 ];
 
 export default function PatientHome() {
@@ -29,6 +31,7 @@ export default function PatientHome() {
       )}
       {tab === "mine" && <MyReservations />}
       {tab === "records" && <MyRecords />}
+      {tab === "contacts" && <Contacts />}
     </Shell>
   );
 }

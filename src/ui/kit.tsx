@@ -187,13 +187,15 @@ export function ErrorNotice({ error, onRetry }: { error: ApiError; onRetry?: () 
   );
 }
 
-/** 샘플 데이터 표시 */
-export const SampleBadge = () => <Chip className="bg-amber-50 text-warn ring-amber-200">샘플 데이터</Chip>;
+/** 아직 만들지 않은 기능의 시연용 예시 표시 */
+export const PlannedBadge = () => <Chip className="bg-amber-50 text-warn ring-amber-200">준비 중(시연용 예시)</Chip>;
 
 /** 예약 상태 칩 */
 export function reservationState(r: Pick<Reservation, "status" | "checkin_status">) {
   if (r.status === "CANCELED") return { label: "취소됨", cls: "bg-red-50 text-danger ring-red-200" };
   if (r.checkin_status === "CHECKED_IN") return { label: "접수완료", cls: "bg-emerald-50 text-ok ring-emerald-200" };
+  if (r.checkin_status === "IN_TREATMENT") return { label: "진료중", cls: "bg-sky-50 text-brand-700 ring-sky-200" };
+  if (r.checkin_status === "COMPLETED") return { label: "진료완료", cls: "bg-slate-100 text-slate-600 ring-slate-200" };
   return { label: "예약확정", cls: "bg-brand-50 text-brand-700 ring-brand-200" };
 }
 
@@ -201,6 +203,17 @@ export const ReservationChip = ({ r }: { r: Pick<Reservation, "status" | "checki
   const s = reservationState(r);
   return <Chip className={s.cls}>{s.label}</Chip>;
 };
+
+/** 대기열의 진료 진행 칩: 진료대기 → 진료중 → 진료완료 */
+const PROGRESS: Record<Reservation["checkin_status"], { label: string; cls: string }> = {
+  NOT_CHECKED_IN: { label: "접수 전", cls: "bg-brand-50 text-brand-700 ring-brand-200" },
+  CHECKED_IN: { label: "진료대기", cls: "bg-amber-50 text-warn ring-amber-200" },
+  IN_TREATMENT: { label: "진료중", cls: "bg-sky-50 text-brand-700 ring-sky-200" },
+  COMPLETED: { label: "진료완료", cls: "bg-slate-100 text-slate-600 ring-slate-200" },
+};
+export const ProgressChip = ({ status }: { status: Reservation["checkin_status"] }) => (
+  <Chip className={PROGRESS[status].cls}>{PROGRESS[status].label}</Chip>
+);
 
 /** 표 머리 (피그마 예약 관리 표) */
 export const Th = ({ children, className }: { children?: ReactNode; className?: string }) => (

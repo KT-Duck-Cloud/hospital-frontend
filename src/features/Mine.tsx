@@ -1,4 +1,4 @@
-/** 환자 화면: 내 예약(R2 본인 범위, R4 취소), 내 진료기록(R11)·영수증(R12) — 진료기록·영수증은 샘플 데이터 */
+/** 환자 화면: 내 예약(R2 본인 범위, R4 취소), 내 진료기록(R11)·영수증(R12) */
 import { Ban, CalendarClock, FileText, Receipt as ReceiptIcon } from "lucide-react";
 import { useState } from "react";
 import { api, toApiError } from "../lib/api";
@@ -7,7 +7,7 @@ import { kstDate, kstFull, kstShort } from "../lib/time";
 import type { MedicalRecord, Page, Receipt, Reservation } from "../lib/types";
 import { useApi } from "../lib/useApi";
 import {
-  Btn, Card, CardHead, cx, Empty, ErrorNotice, Loading, Modal, ReservationChip, SampleBadge, tableHeadRow, tableRow, Th,
+  Btn, Card, CardHead, cx, Empty, ErrorNotice, Loading, Modal, ReservationChip, tableHeadRow, tableRow, Th,
 } from "../ui/kit";
 import { useDirectory } from "./directory";
 
@@ -105,7 +105,7 @@ export function MyRecords() {
   return (
     <div className="grid grid-cols-[1.2fr_1fr] gap-4">
       <Card>
-        <CardHead title="내 진료기록" icon={<FileText size={18} />} right={<SampleBadge />} />
+        <CardHead title="내 진료기록" icon={<FileText size={18} />} />
         <div className="px-6 pb-6">
           {records.loading ? <Loading /> : records.error ? (
             records.error.code === "RECORD_UNAVAILABLE"
@@ -126,7 +126,7 @@ export function MyRecords() {
         </div>
       </Card>
       <Card className="overflow-hidden">
-        <CardHead title="내 영수증" icon={<ReceiptIcon size={18} />} right={<SampleBadge />} />
+        <CardHead title="내 영수증" icon={<ReceiptIcon size={18} />} />
         {receipts.loading ? <Loading /> : receipts.error ? <div className="p-5"><ErrorNotice error={receipts.error} onRetry={receipts.reload} /></div>
           : receipts.data && receipts.data.length ? (
             <table className="w-full text-left text-[14.5px]">

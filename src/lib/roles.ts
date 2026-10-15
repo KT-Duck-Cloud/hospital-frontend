@@ -4,7 +4,7 @@ import type { Role } from "./types";
 export const ROLES: Role[] = ["PATIENT", "NURSE", "DOCTOR", "MANAGER", "ADMIN", "DEPT_HEAD", "DIRECTOR", "DEVELOPER", "TESTER"];
 
 export const ROLE_LABEL: Record<Role, string> = {
-  PATIENT: "일반이용자",
+  PATIENT: "환자",
   NURSE: "간호사",
   DOCTOR: "의사",
   MANAGER: "원무과장",

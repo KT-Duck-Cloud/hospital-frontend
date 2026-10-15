@@ -17,6 +17,9 @@ export type LoginOut = { access_token: string; token_type: string; expires_in: n
 export type Department = { id: number; code: string; name: string };
 export type Doctor = { id: number; department_id: number; name: string; room_no: string | null };
 
+/** 진료 진행: 접수 전 → 진료대기(CHECKED_IN) → 진료중 → 진료완료. 앞으로만 간다 */
+export type CheckinStatus = "NOT_CHECKED_IN" | "CHECKED_IN" | "IN_TREATMENT" | "COMPLETED";
+
 export type Reservation = {
   id: number;
   request_id: string;
@@ -29,7 +32,7 @@ export type Reservation = {
   reserved_at: string;
   visit_type: "FIRST" | "RETURN";
   status: "BOOKED" | "CANCELED";
-  checkin_status: "NOT_CHECKED_IN" | "CHECKED_IN";
+  checkin_status: CheckinStatus;
   checked_in_at: string | null;
   memo: string | null;
   created_by: number | null;
@@ -49,14 +52,20 @@ export type QueueItem = {
   chart_no: string;
   doctor_id: number | null;
   doctor_name: string | null;
+  checkin_status: CheckinStatus;
   reserved_at: string;
   checked_in_at: string;
 };
 export type QueueOut = { date: string; department_id: number | null; items: QueueItem[] };
 
-export type PatientSummary = { id: number; chart_no: string; name: string; birth_date: string; phone_masked: string | null };
-export type Patient = { id: number; chart_no: string; name: string; birth_date: string; phone: string | null; created_at: string };
+export type PatientSummary = { id: number; chart_no: string; name: string; birth_date: string; phone: string | null; phone_is_masked: boolean };
+export type Patient = { id: number; chart_no: string; name: string; birth_date: string; phone: string | null; phone_is_masked: boolean; created_at: string };
 export type PatientDetail = Patient & { recent_reservations: Reservation[] };
+
+export type DepartmentContact = { id: number; code: string; name: string; phone: string | null; phone_is_masked: boolean };
+export type StaffContact = { id: number; name: string; role: Role; department_id: number | null; work_phone: string | null; work_phone_is_masked: boolean };
+/** GET /contacts: 병원 대표 번호 + 진료과 대표 번호 + 역할별 직원 연락처 */
+export type ContactsOut = { hospital_phone: string | null; departments: DepartmentContact[]; staff: StaffContact[] };
 
 export type SlotsOut = { doctor_id: number; date: string; slot_minutes: number; available: string[] };
 
