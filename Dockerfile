@@ -34,7 +34,7 @@ ENV APP_VERSION=${APP_VERSION} \
 
 # 설정 파일은 root 소유(읽기 전용)로 두고, 실행은 이미지 기본 사용자(nginx, uid 101)로 한다.
 USER root
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN apk upgrade --no-cache && rm -f /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/security-headers.conf nginx/proxy.conf /etc/nginx/snippets/
 COPY nginx/web.conf.template /etc/nginx/templates/web.conf.template
